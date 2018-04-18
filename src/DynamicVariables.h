@@ -39,6 +39,7 @@ using namespace std;
 class TrajectoryFlow;
 //MODIF***
 class TrajectoryMotion;
+class TrajectoryDeformation;
 class TrajectoryT2s;
 class Trajectory1D;
 class TrajectoryEmpty;
@@ -119,7 +120,7 @@ class DynamicVariables {
 //MODIF
     TrajectoryFlow* stub_flow;
 //MODIF***
-    TrajectoryMotion* stub_motion;
+    TrajectoryDeformation* stub_motion;
     TrajectoryT2s* stub_T2s;
     Trajectory1D* stub_r1;
     Trajectory1D* stub_r2;
