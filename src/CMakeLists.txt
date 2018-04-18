@@ -36,6 +36,7 @@ list (APPEND CORE_SRC AnalyticCoil.cpp AnalyticCoil.h
   TrajectoryDiffusion.h TrajectoryEmpty.h TrajectoryInterface.cpp
   TrajectoryInterface.h TrajectoryMotion.cpp TrajectoryMotion.h
   TrajectoryFlow.cpp TrajectoryFlow.h
+  TrajectoryDeformation.cpp TrajectoryDeformation.h
   TrajectoryT2s.cpp TrajectoryT2s.h TrapGradPulse.cpp TrapGradPulse.h
   TriangleGradPulse.cpp TriangleGradPulse.h TxRxPhase.cpp TxRxPhase.h
   World.cpp World.h XMLIO.cpp XMLIO.h config.h ginac_functions.h list.h
