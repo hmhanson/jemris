@@ -69,9 +69,9 @@ void TrajectoryDeformation::GetValueDerived(double time, double *value) {
     size_t zi = min(max(size_t(int_part), size_t(0)), m_field.Dim(3));
 
     // also calculate indices plus one for the interpolation
-    size_t xip = min(xi + 1, m_field.Dim(1));
-    size_t yip = min(xi + 1, m_field.Dim(2));
-    size_t zip = min(zi + 1, m_field.Dim(3));
+    size_t xip = min(xi + 1, m_field.Dim(1) - 1);
+    size_t yip = min(yi + 1, m_field.Dim(2) - 1);
+    size_t zip = min(zi + 1, m_field.Dim(3) - 1);
     size_t tip = (ti + 1) % m_field.Dim(4);
 
     for (size_t i=0; i < 3; i++) {
