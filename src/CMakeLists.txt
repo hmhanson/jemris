@@ -52,7 +52,7 @@ endif()
 
 list (APPEND COMMON_LIBS ${HDF5_CXX_LIBRARIES} ${Xerces_LIBRARY} ${GINAC_LIBRARIES} ${SUNDIALS_LIBRARIES})
 
-add_library (core ${CORE_SRC})
+add_library (core ${CORE_SRC} TrajectoryRespiration.cpp TrajectoryRespiration.h)
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   target_link_libraries (core ${COMMON_LIBS} )
