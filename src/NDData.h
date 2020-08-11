@@ -111,12 +111,29 @@ public:
      * @param n2 Third side
      */
     NDData (const size_t n0, const size_t n1, const size_t n2, const size_t n3) {
-    	_dims.resize(3);
+    	_dims.resize(4);
     	_dims[0] = n0;
     	_dims[1] = n1;
     	_dims[2] = n2;
     	_dims[3] = n3;
     	_data.resize(prod(_dims));
+    }
+
+    /**
+ * @brief 5D-data (convenience constructor)
+ *
+ * @param n0 First side
+ * @param n1 Second side
+ * @param n2 Third side
+ */
+    NDData (const size_t n0, const size_t n1, const size_t n2, const size_t n3, const size_t n4) {
+        _dims.resize(5);
+        _dims[0] = n0;
+        _dims[1] = n1;
+        _dims[2] = n2;
+        _dims[3] = n3;
+        _dims[4] = n4;
+        _data.resize(prod(_dims));
     }
 
     /**
