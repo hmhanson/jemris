@@ -40,6 +40,7 @@ class TrajectoryFlow;
 //MODIF***
 class TrajectoryMotion;
 class TrajectoryDeformation;
+class TrajectoryRespiration;
 class TrajectoryT2s;
 class Trajectory1D;
 class TrajectoryEmpty;
@@ -120,7 +121,8 @@ class DynamicVariables {
 //MODIF
     TrajectoryFlow* stub_flow;
 //MODIF***
-    TrajectoryDeformation* stub_motion;
+    //TrajectoryDeformation* stub_motion;
+    TrajectoryRespiration* stub_motion;
     TrajectoryT2s* stub_T2s;
     Trajectory1D* stub_r1;
     Trajectory1D* stub_r2;

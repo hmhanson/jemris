@@ -31,6 +31,7 @@
 #include "DynamicVariables.h"
 #include "TrajectoryMotion.h"
 #include "TrajectoryDeformation.h"
+#include "TrajectoryRespiration.h"
 //MODIF
 #include "TrajectoryFlow.h"
 //MODIF***
@@ -53,7 +54,8 @@ DynamicVariables* DynamicVariables::instance() {
         m_instance->stub_flow = new TrajectoryFlow();
 //MODIF***
     	//m_instance->stub_motion = new TrajectoryMotion();
-    	m_instance->stub_motion = new TrajectoryDeformation();
+    	//m_instance->stub_motion = new TrajectoryDeformation();
+        m_instance->stub_motion = new TrajectoryRespiration();
 	    m_instance->stub_T2s = new TrajectoryT2s();
     	m_instance->stub_r1 = new Trajectory1D();
     	m_instance->stub_r2 = new Trajectory1D();
