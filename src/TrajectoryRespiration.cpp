@@ -74,91 +74,59 @@ void TrajectoryRespiration::LoadFile(string filename) {
 
 void TrajectoryRespiration::GetValueDerived(double time, double *value) {
 
-    bool same_spin = true;
-    if (store_x != value[0]) {same_spin = false;}
-    if (store_y != value[1]) {same_spin = false;}
-    if (store_z != value[2]) {same_spin = false;}
-
-
-    if (same_spin == false) {
-
-
-        // calculate motion model indices
-        dx = modf((value[0] - m_offset[0]) / m_res[1], &int_part);
-        xi = min(max(size_t(int_part), size_t(0)), m_ap.Dim(1));
-        dy = modf((value[1] - m_offset[1]) / m_res[2], &int_part);
-        yi = min(max(size_t(int_part), size_t(0)), m_ap.Dim(2));
-        dz = modf((value[2] - m_offset[2]) / m_res[3], &int_part);
-        zi = min(max(size_t(int_part), size_t(0)), m_ap.Dim(3));
-
-
-        // also calculate indices plus one for the interpolation
-        xip = min(xi + 1, m_ap.Dim(1) - 1);
-        yip = min(yi + 1, m_ap.Dim(2) - 1);
-        zip = min(zi + 1, m_ap.Dim(3) - 1);
-
-
-        // interpolate motion model AP, SI and offset fields around the spin
-        for (size_t i=0; i < 3; i++) {
-            m_ap_interpolated[i] = (1 - dx) * (1 - dy) * (1 - dz) * m_ap(i, xi, yi, zi) +
-                                   (dx) * (1 - dy) * (1 - dz) * m_ap(i, xip, yi, zi) +
-                                   (1 - dx) * (dy) * (1 - dz) * m_ap(i, xi, yip, zi) +
-                                   (1 - dx) * (1 - dy) * (dz) * m_ap(i, xi, yi, zip) +
-                                   (dx) * (dy) * (1 - dz) * m_ap(i, xip, yip, zi) +
-                                   (dx) * (1 - dy) * (dz) * m_ap(i, xip, yi, zip) +
-                                   (1 - dx) * (dy) * (dz) * m_ap(i, xi, yip, zip) +
-                                   (dx) * (dy) * (dz) * m_ap(i, xip, yip, zip);
-
-        }
-
-
-
-        for (size_t i=0; i < 3; i++) {
-            m_si_interpolated[i] = (1 - dx) * (1 - dy) * (1 - dz) * m_si(i, xi, yi, zi) +
-                                   (dx) * (1 - dy) * (1 - dz) * m_si(i, xip, yi, zi) +
-                                   (1 - dx) * (dy) * (1 - dz) * m_si(i, xi, yip, zi) +
-                                   (1 - dx) * (1 - dy) * (dz) * m_si(i, xi, yi, zip) +
-                                   (dx) * (dy) * (1 - dz) * m_si(i, xip, yip, zi) +
-                                   (dx) * (1 - dy) * (dz) * m_si(i, xip, yi, zip) +
-                                   (1 - dx) * (dy) * (dz) * m_si(i, xi, yip, zip) +
-                                   (dx) * (dy) * (dz) * m_si(i, xip, yip, zip) ;
-        }
-
-
-
-        for (size_t i=0; i < 3; i++) {
-            m_model_offset_interpolated[i]=(1 - dx) * (1 - dy) * (1 - dz) * m_model_offset(i, xi, yi, zi) +
-                                           (dx) * (1 - dy) * (1 - dz) * m_model_offset(i, xip, yi, zi) +
-                                           (1 - dx) * (dy) * (1 - dz) * m_model_offset(i, xi, yip, zi) +
-                                           (1 - dx) * (1 - dy) * (dz) * m_model_offset(i, xi, yi, zip) +
-                                           (dx) * (dy) * (1 - dz) * m_model_offset(i, xip, yip, zi) +
-                                           (dx) * (1 - dy) * (dz) * m_model_offset(i, xip, yi, zip) +
-                                           (1 - dx) * (dy) * (dz) * m_model_offset(i, xi, yip, zip) +
-                                           (dx) * (dy) * (dz) * m_model_offset(i, xip, yip, zip);
-
-        }
-
-
-    }
-
 
     // time is cyclical so we calculate mod total duration
+    // but space is clamped at the edges
+    double int_part;
     double dt = modf(time / m_res[0], &int_part);
     size_t ti = int(int_part) % m_breathing_trace.Dim(1);
+    double dx = modf((value[0] - m_offset[0]) / m_res[1], &int_part);
+    size_t xi = min(max(size_t(int_part), size_t(0)), m_ap.Dim(1));
+    double dy = modf((value[1] - m_offset[1]) / m_res[2], &int_part);
+    size_t yi = min(max(size_t(int_part), size_t(0)), m_ap.Dim(2));
+    double dz = modf((value[2] - m_offset[2]) / m_res[3], &int_part);
+    size_t zi = min(max(size_t(int_part), size_t(0)), m_ap.Dim(3));
+
+
+
+    // also calculate indices plus one for the interpolation
+    size_t xip = min(xi + 1, m_ap.Dim(1) - 1);
+    size_t yip = min(yi + 1, m_ap.Dim(2) - 1);
+    size_t zip = min(zi + 1, m_ap.Dim(3) - 1);
     size_t tip = (ti + 1) % m_breathing_trace.Dim(1);
 
-    // interpolate surrogate signal AP and SI for current time
-    double ap = m_breathing_trace(0,ti) * (1-dt) + m_breathing_trace(0,tip) * (dt);
-    double si = m_breathing_trace(1,ti) * (1-dt) + m_breathing_trace(1,tip) * (dt);
 
-    // store spin co-ordinates for next iteration
-    store_x = value[0];
-    store_y = value[1];
-    store_z = value[2];
+    NDData<double> DVF(3,2,2,2);
 
-    // calculate spin displacement
+    // calculate DVF for indices defined above
     for (size_t i=0; i < 3; i++) {
-        value[i] += ap * m_ap_interpolated[i] + si * m_si_interpolated[i] + m_model_offset_interpolated[i];
+        double ap = m_breathing_trace(0,ti) * (1-dt) + m_breathing_trace(0,tip) * (dt);
+        double si = m_breathing_trace(1,ti) * (1-dt) + m_breathing_trace(1,tip) * (dt);
+
+
+        DVF(i,0,0, 0) = ap * m_ap(i,xi,yi,zi) + si * m_si(i,xi,yi,zi) + m_model_offset(i,xi,yi,zi);
+        DVF(i,1,0, 0) = ap * m_ap(i,xip,yi,zi) + si * m_si(i,xip,yi,zi) + m_model_offset(i,xip,yi,zi);
+        DVF(i,0,1, 0) = ap * m_ap(i,xi,yip,zi) + si * m_si(i,xi,yip,zi) + m_model_offset(i,xi,yip,zi);
+        DVF(i,1,1, 0) = ap * m_ap(i,xip,yip,zi) + si * m_si(i,xip,yip,zi) + m_model_offset(i,xip,yip,zi);
+
+
+        DVF(i,0,0,1) = ap * m_ap(i,xi,yi,zip) + si * m_si(i,xi,yi,zip) + m_model_offset(i,xi,yi,zip);
+        DVF(i,1,0,1) = ap * m_ap(i,xip,yi,zip) + si * m_si(i,xip,yi,zip) + m_model_offset(i,xip,yi,zip);
+        DVF(i,0,1,1) = ap * m_ap(i,xi,yip,zip) + si * m_si(i,xi,yip,zip) + m_model_offset(i,xi,yip,zip);
+        DVF(i,1,1,1) = ap * m_ap(i,xip,yip,zip) + si * m_si(i,xip,yip,zip) + m_model_offset(i,xip,yip,zip);
+
     }
+
+    for (size_t i=0; i < 3; i++) {
+        value[i] += (1 - dx) * (1 - dy) * (1 - dz) * DVF(i, 0, 0, 0) +
+                    (dx) * (1 - dy) * (1 - dz) * DVF(i, 1, 0, 0) +
+                    (1 - dx) * (dy) * (1 - dz) * DVF(i, 0, 1, 0) +
+                    (1 - dx) * (1 - dy) * (dz) * DVF(i, 0, 0, 1) +
+                    (dx) * (dy) * (1 - dz) * DVF(i, 1, 1, 0) +
+                    (dx) * (1 - dy) * (dz) * DVF(i, 1, 0, 1) +
+                    (1 - dx) * (dy) * (dz) * DVF(i, 0, 1, 1) +
+                    (dx) * (dy) * (dz) * DVF(i, 1, 1, 1) ;
+    }
+
 
 }
