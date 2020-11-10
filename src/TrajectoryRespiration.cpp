@@ -96,62 +96,36 @@ void TrajectoryRespiration::GetValueDerived(double time, double *value) {
     size_t tip = (ti + 1) % m_breathing_trace.Dim(1);
 
 
-    NDData<double> DVF(3,2,2,2,2);
+    NDData<double> DVF(3,2,2,2);
 
     // calculate DVF for indices defined above
     for (size_t i=0; i < 3; i++) {
-        double ap = m_breathing_trace(0,ti);
-        double si = m_breathing_trace(1,ti);
+        double ap = m_breathing_trace(0,ti) * (1-dt) + m_breathing_trace(0,tip) * (dt);
+        double si = m_breathing_trace(1,ti) * (1-dt) + m_breathing_trace(1,tip) * (dt);
 
 
-        DVF(i,0,0, 0, 0) = ap * m_ap(i,xi,yi,zi) + si * m_si(i,xi,yi,zi) + m_model_offset(i,xi,yi,zi);
-        DVF(i,1,0, 0, 0) = ap * m_ap(i,xip,yi,zi) + si * m_si(i,xip,yi,zi) + m_model_offset(i,xip,yi,zi);
-        DVF(i,0,1, 0, 0) = ap * m_ap(i,xi,yip,zi) + si * m_si(i,xi,yip,zi) + m_model_offset(i,xi,yip,zi);
-        DVF(i,1,1, 0, 0) = ap * m_ap(i,xip,yip,zi) + si * m_si(i,xip,yip,zi) + m_model_offset(i,xip,yip,zi);
+        DVF(i,0,0, 0) = ap * m_ap(i,xi,yi,zi) + si * m_si(i,xi,yi,zi) + m_model_offset(i,xi,yi,zi);
+        DVF(i,1,0, 0) = ap * m_ap(i,xip,yi,zi) + si * m_si(i,xip,yi,zi) + m_model_offset(i,xip,yi,zi);
+        DVF(i,0,1, 0) = ap * m_ap(i,xi,yip,zi) + si * m_si(i,xi,yip,zi) + m_model_offset(i,xi,yip,zi);
+        DVF(i,1,1, 0) = ap * m_ap(i,xip,yip,zi) + si * m_si(i,xip,yip,zi) + m_model_offset(i,xip,yip,zi);
 
 
-
-        DVF(i,0,0,1,0) = ap * m_ap(i,xi,yi,zip) + si * m_si(i,xi,yi,zip) + m_model_offset(i,xi,yi,zip);
-        DVF(i,1,0,1,0) = ap * m_ap(i,xip,yi,zip) + si * m_si(i,xip,yi,zip) + m_model_offset(i,xip,yi,zip);
-        DVF(i,0,1,1,0) = ap * m_ap(i,xi,yip,zip) + si * m_si(i,xi,yip,zip) + m_model_offset(i,xi,yip,zip);
-        DVF(i,1,1,1,0) = ap * m_ap(i,xip,yip,zip) + si * m_si(i,xip,yip,zip) + m_model_offset(i,xip,yip,zip);
-
-        ap = m_breathing_trace(0,tip);
-        si = m_breathing_trace(1,tip);
-
-
-        DVF(i,0,0, 0, 1) = ap * m_ap(i,xi,yi,zi) + si * m_si(i,xi,yi,zi) + m_model_offset(i,xi,yi,zi);
-        DVF(i,1,0, 0, 1) = ap * m_ap(i,xip,yi,zi) + si * m_si(i,xip,yi,zi) + m_model_offset(i,xip,yi,zi);
-        DVF(i,0,1, 0, 1) = ap * m_ap(i,xi,yip,zi) + si * m_si(i,xi,yip,zi) + m_model_offset(i,xi,yip,zi);
-        DVF(i,1,1, 0, 1) = ap * m_ap(i,xip,yip,zi) + si * m_si(i,xip,yip,zi) + m_model_offset(i,xip,yip,zi);
-
-
-
-        DVF(i,0,0,1,1) = ap * m_ap(i,xi,yi,zip) + si * m_si(i,xi,yi,zip) + m_model_offset(i,xi,yi,zip);
-        DVF(i,1,0,1,1) = ap * m_ap(i,xip,yi,zip) + si * m_si(i,xip,yi,zip) + m_model_offset(i,xip,yi,zip);
-        DVF(i,0,1,1,1) = ap * m_ap(i,xi,yip,zip) + si * m_si(i,xi,yip,zip) + m_model_offset(i,xi,yip,zip);
-        DVF(i,1,1,1,1) = ap * m_ap(i,xip,yip,zip) + si * m_si(i,xip,yip,zip) + m_model_offset(i,xip,yip,zip);
-
+        DVF(i,0,0,1) = ap * m_ap(i,xi,yi,zip) + si * m_si(i,xi,yi,zip) + m_model_offset(i,xi,yi,zip);
+        DVF(i,1,0,1) = ap * m_ap(i,xip,yi,zip) + si * m_si(i,xip,yi,zip) + m_model_offset(i,xip,yi,zip);
+        DVF(i,0,1,1) = ap * m_ap(i,xi,yip,zip) + si * m_si(i,xi,yip,zip) + m_model_offset(i,xi,yip,zip);
+        DVF(i,1,1,1) = ap * m_ap(i,xip,yip,zip) + si * m_si(i,xip,yip,zip) + m_model_offset(i,xip,yip,zip);
 
     }
 
     for (size_t i=0; i < 3; i++) {
-        value[i] += (1 - dt) * (1 - dx) * (1 - dy) * (1 - dz) * DVF(i, 0, 0, 0, 0) +
-                    (dt) * (1 - dx) * (1 - dy) * (1 - dz) * DVF(i, 0, 0, 0, 1) +
-                    (1 - dt) * (dx) * (1 - dy) * (1 - dz) * DVF(i, 1, 0, 0, 0) +
-                    (1 - dt) * (1 - dx) * (dy) * (1 - dz) * DVF(i, 0, 1, 0, 0) +
-                    (1 - dt) * (1 - dx) * (1 - dy) * (dz) * DVF(i, 0, 0, 1, 0) +
-                    (dt) * (dx) * (1 - dy) * (1 - dz) * DVF(i, 1, 0, 0, 1) +
-                    (dt) * (1 - dx) * (dy) * (1 - dz) * DVF(i, 0, 1, 0, 1) +
-                    (dt) * (1 - dx) * (1 - dy) * (dz) * DVF(i, 0, 0, 1, 1) +
-                    (1 - dt) * (dx) * (dy) * (1 - dz) * DVF(i, 1, 1, 0, 0) +
-                    (1 - dt) * (dx) * (1 - dy) * (dz) * DVF(i, 1, 0, 1, 0) +
-                    (1 - dt) * (1 - dx) * (dy) * (dz) * DVF(i, 0, 1, 1, 0) +
-                    (dt) * (dx) * (dy) * (1 - dz) * DVF(i, 1, 1, 0, 1) +
-                    (dt) * (dx) * (1 - dy) * (dz) * DVF(i, 1, 0, 1, 1) +
-                    (dt) * (1 - dx) * (dy) * (dz) * DVF(i, 0, 1, 1, 1) +
-                    (1 - dt) * (dx) * (dy) * (dz) * DVF(i, 1, 1, 1, 0) +
-                    (dt) * (dx) * (dy) * (dz) * DVF(i, 1, 1, 1, 1);
+        value[i] += (1 - dx) * (1 - dy) * (1 - dz) * DVF(i, 0, 0, 0) +
+                    (dx) * (1 - dy) * (1 - dz) * DVF(i, 1, 0, 0) +
+                    (1 - dx) * (dy) * (1 - dz) * DVF(i, 0, 1, 0) +
+                    (1 - dx) * (1 - dy) * (dz) * DVF(i, 0, 0, 1) +
+                    (dx) * (dy) * (1 - dz) * DVF(i, 1, 1, 0) +
+                    (dx) * (1 - dy) * (dz) * DVF(i, 1, 0, 1) +
+                    (1 - dx) * (dy) * (dz) * DVF(i, 0, 1, 1) +
+                    (dx) * (dy) * (dz) * DVF(i, 1, 1, 1) ;
     }
 
 
