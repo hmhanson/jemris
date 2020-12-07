@@ -17,6 +17,24 @@ public:
 
     virtual void LoadFile(string filename);
 
+    double dx;
+    size_t xi;
+    double dy;
+    size_t yi;
+    double dz;
+    size_t zi;
+    size_t xip;
+    size_t yip;
+    size_t zip;
+
+    double int_part;
+    double store_x;
+    double store_y;
+    double store_z;
+    vector<double> m_ap_interpolated{0,0,0};
+    vector<double> m_si_interpolated{0,0,0};
+    vector<double> m_model_offset_interpolated{0,0,0};
+
 protected:
     vector<double> m_res;
     vector<double> m_offset;
