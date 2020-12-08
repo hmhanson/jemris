@@ -127,7 +127,7 @@ void TrajectoryRespiration::GetValueDerived(double time, double *value) {
 
 
         for (size_t i=0; i < 3; i++) {
-            m_model_offset_interpolated[i]=(1 - dx) * (1 - dy) * (1 - dz) * m_model_offset(i, xi, yi, zi) +
+            m_model_offset_interpolated[i] = (1 - dx) * (1 - dy) * (1 - dz) * m_model_offset(i, xi, yi, zi) +
                                            (dx) * (1 - dy) * (1 - dz) * m_model_offset(i, xip, yi, zi) +
                                            (1 - dx) * (dy) * (1 - dz) * m_model_offset(i, xi, yip, zi) +
                                            (1 - dx) * (1 - dy) * (dz) * m_model_offset(i, xi, yi, zip) +
