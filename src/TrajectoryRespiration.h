@@ -31,9 +31,9 @@ public:
     double store_x;
     double store_y;
     double store_z;
-    vector<double> m_ap_interpolated{0,0,0};
-    vector<double> m_si_interpolated{0,0,0};
-    vector<double> m_model_offset_interpolated{0,0,0};
+    double m_ap_interpolated[3];
+    double m_si_interpolated[3];
+    double m_model_offset_interpolated[3];
 
 protected:
     vector<double> m_res;
